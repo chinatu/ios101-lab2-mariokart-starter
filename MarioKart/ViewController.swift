@@ -64,9 +64,14 @@ class ViewController: UIViewController,
     // Exercise 1: Assign the result of MushroomGenerator.maybeGenerateMushroomPowerup()
     // to a variable. Print something if it's not nil
     // ...
-    
+      if let powerup = MushroomGenerator.maybeGenerateMushroomPowerup() {
+          useMushroomPowerupOnMario(powerup: powerup)
+      } else {
+          print("We don't have a power up")
+      }
     // Exercise 2: Use the powerup on Mario using the useMushroomPowerupOnMario function
     // ...
+//      useMushroomPowerupOnMario(powerup: powerup)
   }
   
   private func useMushroomPowerupOnMario(powerup: MushroomPowerup) {
@@ -82,7 +87,27 @@ class ViewController: UIViewController,
   
   // Exercise 3: Decipher the mystery box and apply the correct effect on mario
   private func decipher(mysteryBox: MysteryBox) {
-    
+      print(mysteryBox.mysteryEffect)
+      
+      guard let effectDictionary = mysteryBox.mysteryEffect as? [String: String] else {
+          assertionFailure("Expecting value of type dictionary")
+          return
+      }
+      
+      guard let effect = effectDictionary["effect"] else {
+          assertionFailure("Expecting value of type String")
+          return
+      }
+      
+      if effect == "translate" {
+            translate(kart: kartView1, by: view.bounds.width)
+          } else if effect == "rotate" {
+            rotate(kart: kartView1)
+          } else if effect == "scale" {
+            scale(kart: kartView1)
+          } else {
+            assertionFailure("Unexpected effect")
+          }
   }
   
   private func translate(kart: UIView?,
@@ -132,16 +157,40 @@ class ViewController: UIViewController,
   
   // Exercise 4: Implement applyNumKartsSetting to show the correct number of karts
   func applyNumKartsSetting(_ settings: [String : Any]) {
+      
+      guard let numKarts = settings["numKarts"] as? Int else {
+          assertionFailure("Expecting Int, but got nil")
+          return
+      }
+      
+      kartView0.isHidden = numKarts < 2
+      kartView2.isHidden = numKarts < 3
     
   }
   
   // Exercise 5: Implement applyKartSizeSetting to set the correct kart size
   func applyKartSizeSetting(_ settings: [String : Any]) {
+      guard let kartSizeMultiplier = settings["kartSize"] as? Int else {
+          assertionFailure("Expecting Int, but got nil")
+          return
+      }
+      
+      let kartSize = 1.0 + 0.05 * Double(kartSizeMultiplier)
+      let transform = CGAffineTransformIdentity.scaledBy(x: kartSize, y: kartSize)
+      kartView0.transform = transform
+      kartView1.transform = transform
+      kartView2.transform = transform
     
   }
   
   // Exercise 6: Implement applySpeedMultiplierSetting to set the correct speed
   func applySpeedMultiplierSetting(_ settings: [String : Any]) {
+      guard let speedMultiplier = settings["speedMultiplier"] as? Int else {
+          assertionFailure("Expecting Int, but got nil")
+          return
+      }
+      
+      self.speedMultiplier = Double(speedMultiplier)
     
   }
 }
